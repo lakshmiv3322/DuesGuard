@@ -1,0 +1,4 @@
+com\duesguard\PaymentBalanceTest.class
+com\duesguard\PriorityScoreTest.class
+com\duesguard\FilePersistenceTest.class
+com\duesguard\OverdueCalculationTest.class
