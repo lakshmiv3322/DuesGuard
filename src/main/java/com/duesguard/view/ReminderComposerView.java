@@ -265,7 +265,7 @@ public class ReminderComposerView extends ScrollPane {
             r.setScheduledDate(LocalDate.now().plusDays(1));
             r.setMessage(messageArea.getText());
             store.addReminder(r);
-            Toast.show((Pane) getScene().getRoot(), "Reminder scheduled for tomorrow!", true);
+            Toast.show(this, "Reminder scheduled for tomorrow!", true);
         });
 
         Button btnCopy = new Button("📋 Copy Message");
@@ -274,7 +274,7 @@ public class ReminderComposerView extends ScrollPane {
             ClipboardContent cc = new ClipboardContent();
             cc.putString(messageArea.getText());
             Clipboard.getSystemClipboard().setContent(cc);
-            Toast.show((Pane) getScene().getRoot(), "Message copied to clipboard!", true);
+            Toast.show(this, "Message copied to clipboard!", true);
         });
 
         Button btnMarkSent = new Button("✓ Mark as Sent");
@@ -282,7 +282,7 @@ public class ReminderComposerView extends ScrollPane {
         btnMarkSent.setOnAction(e -> {
             FollowUpLog log = new FollowUpLog(invoice.getId(), selectedChannel.name(), "Sent " + selectedTone.name() + " reminder");
             store.addFollowUpLog(log);
-            Toast.show((Pane) getScene().getRoot(), "Follow-up logged successfully!", true);
+            Toast.show(this, "Follow-up logged successfully!", true);
         });
 
         btnRow.getChildren().addAll(btnSchedule, btnCopy, btnMarkSent);

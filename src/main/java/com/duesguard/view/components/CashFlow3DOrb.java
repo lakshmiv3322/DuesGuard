@@ -27,16 +27,16 @@ public class CashFlow3DOrb extends StackPane {
         // 3D root group
         Group root3D = new Group();
 
-        // Central cash-flow orb
-        Sphere orb = new Sphere(28);
+        // Central cash-flow orb (mint glow)
+        Sphere orb = new Sphere(22);
         PhongMaterial orbMat = new PhongMaterial();
         orbMat.setDiffuseColor(Color.web("#49E3B4"));
         orbMat.setSpecularColor(Color.web("#FFFFFF"));
-        orbMat.setSpecularPower(32.0);
+        orbMat.setSpecularPower(36.0);
         orb.setMaterial(orbMat);
 
-        // Orbit ring around the orb
-        Cylinder ring = new Cylinder(38, 2);
+        // Orbit ring around the orb (violet tilted disk)
+        Cylinder ring = new Cylinder(32, 1.8);
         ring.setRotationAxis(Rotate.X_AXIS);
         ring.setRotate(65);
         PhongMaterial ringMat = new PhongMaterial();
@@ -44,16 +44,28 @@ public class CashFlow3DOrb extends StackPane {
         ringMat.setSpecularColor(Color.web("#B0B5FF"));
         ring.setMaterial(ringMat);
 
-        // Secondary small satellite node
-        Sphere satellite = new Sphere(6);
-        satellite.setTranslateX(42);
-        satellite.setTranslateY(-10);
-        PhongMaterial satMat = new PhongMaterial();
-        satMat.setDiffuseColor(Color.web("#FFB84D"));
-        satellite.setMaterial(satMat);
+        // Satellite 1: Inflow node (amber)
+        Sphere satellite1 = new Sphere(5);
+        satellite1.setTranslateX(34);
+        satellite1.setTranslateY(-8);
+        satellite1.setTranslateZ(6);
+        PhongMaterial sat1Mat = new PhongMaterial();
+        sat1Mat.setDiffuseColor(Color.web("#FFB84D"));
+        sat1Mat.setSpecularColor(Color.web("#FFF3CC"));
+        satellite1.setMaterial(sat1Mat);
+
+        // Satellite 2: Recovered inflow node (violet-mint)
+        Sphere satellite2 = new Sphere(4);
+        satellite2.setTranslateX(-30);
+        satellite2.setTranslateY(8);
+        satellite2.setTranslateZ(-8);
+        PhongMaterial sat2Mat = new PhongMaterial();
+        sat2Mat.setDiffuseColor(Color.web("#5AEFBE"));
+        sat2Mat.setSpecularColor(Color.web("#FFFFFF"));
+        satellite2.setMaterial(sat2Mat);
 
         // Lighting
-        AmbientLight ambient = new AmbientLight(Color.color(0.3, 0.35, 0.45));
+        AmbientLight ambient = new AmbientLight(Color.color(0.35, 0.4, 0.5));
         PointLight point = new PointLight(Color.web("#49E3B4"));
         point.setTranslateX(-60);
         point.setTranslateY(-60);
@@ -64,14 +76,14 @@ public class CashFlow3DOrb extends StackPane {
         point2.setTranslateY(60);
         point2.setTranslateZ(-80);
 
-        Group orbGroup = new Group(orb, ring, satellite);
+        Group orbGroup = new Group(orb, ring, satellite1, satellite2);
         root3D.getChildren().addAll(ambient, point, point2, orbGroup);
 
         // SubScene with camera
         PerspectiveCamera camera = new PerspectiveCamera(true);
         camera.setNearClip(0.1);
         camera.setFarClip(1000.0);
-        camera.setTranslateZ(-160);
+        camera.setTranslateZ(-155);
 
         SubScene subScene = new SubScene(root3D, width, height, true, SceneAntialiasing.BALANCED);
         subScene.setFill(Color.TRANSPARENT);
@@ -79,8 +91,8 @@ public class CashFlow3DOrb extends StackPane {
 
         // Gentle floating animation
         TranslateTransition floatTrans = new TranslateTransition(Duration.seconds(2.5), orbGroup);
-        floatTrans.setFromY(-6);
-        floatTrans.setToY(6);
+        floatTrans.setFromY(-5);
+        floatTrans.setToY(5);
         floatTrans.setAutoReverse(true);
         floatTrans.setCycleCount(Animation.INDEFINITE);
         floatTrans.setInterpolator(Interpolator.EASE_BOTH);
@@ -96,6 +108,18 @@ public class CashFlow3DOrb extends StackPane {
 
         getChildren().add(subScene);
         setStyle("-fx-cursor: hand;");
+
+        // Interactive hover feedback
+        setOnMouseEntered(e -> {
+            rotTrans.setRate(2.0);
+            subScene.setScaleX(1.08);
+            subScene.setScaleY(1.08);
+        });
+        setOnMouseExited(e -> {
+            rotTrans.setRate(1.0);
+            subScene.setScaleX(1.0);
+            subScene.setScaleY(1.0);
+        });
 
         setOnMouseClicked(e -> {
             if (onClickAction != null) onClickAction.run();

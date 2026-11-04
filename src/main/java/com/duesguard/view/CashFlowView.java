@@ -378,9 +378,12 @@ public class CashFlowView extends ScrollPane {
     }
 
     private void openWhatIfDialog() {
+        StackPane contentArea = NavigationManager.getInstance().getContentArea();
+        if (contentArea == null) return;
+
         StackPane overlay = new StackPane();
         overlay.setStyle("-fx-background-color: rgba(11, 16, 32, 0.85);");
-        overlay.setPrefSize(getWidth(), getHeight());
+        overlay.setPrefSize(contentArea.getWidth(), contentArea.getHeight());
 
         VBox card = new VBox(20);
         card.setMaxWidth(520);
@@ -415,17 +418,20 @@ public class CashFlowView extends ScrollPane {
 
         Button btnClose = new Button("Close Simulator");
         btnClose.setStyle("-fx-background-color: #49E3B4; -fx-text-fill: #0B1020; -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-radius: 8; -fx-padding: 8 20; -fx-cursor: hand;");
-        btnClose.setOnAction(e -> ((Pane) getParent()).getChildren().remove(overlay));
+        btnClose.setOnAction(e -> contentArea.getChildren().remove(overlay));
 
         card.getChildren().addAll(badge, title, s1, s2, btnClose);
         overlay.getChildren().add(card);
-        ((Pane) getParent()).getChildren().add(overlay);
+        contentArea.getChildren().add(overlay);
     }
 
     private void openAddExpenseDialog() {
+        StackPane contentArea = NavigationManager.getInstance().getContentArea();
+        if (contentArea == null) return;
+
         StackPane overlay = new StackPane();
         overlay.setStyle("-fx-background-color: rgba(11, 16, 32, 0.85);");
-        overlay.setPrefSize(getWidth(), getHeight());
+        overlay.setPrefSize(contentArea.getWidth(), contentArea.getHeight());
 
         VBox card = new VBox(16);
         card.setMaxWidth(440);
@@ -449,7 +455,7 @@ public class CashFlowView extends ScrollPane {
 
         Button btnCancel = new Button("Cancel");
         btnCancel.setStyle("-fx-background-color: transparent; -fx-text-fill: #9BA8BC; -fx-cursor: hand;");
-        btnCancel.setOnAction(e -> ((Pane) getParent()).getChildren().remove(overlay));
+        btnCancel.setOnAction(e -> contentArea.getChildren().remove(overlay));
 
         Button btnSave = new Button("Save Expense");
         btnSave.setStyle("-fx-background-color: #49E3B4; -fx-text-fill: #0B1020; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 18; -fx-cursor: hand;");
@@ -458,8 +464,8 @@ public class CashFlowView extends ScrollPane {
                 double amt = Double.parseDouble(amtField.getText().trim());
                 Expense exp = new Expense(catCombo.getValue(), descField.getText().trim(), amt, duePicker.getValue());
                 store.addExpense(exp);
-                ((Pane) getParent()).getChildren().remove(overlay);
-                Toast.show((Pane) getParent(), "Expense added: " + CurrencyFormatter.format(amt), true);
+                contentArea.getChildren().remove(overlay);
+                Toast.show(contentArea, "Expense added: " + CurrencyFormatter.format(amt), true);
             } catch (Exception ignored) {}
         });
 
@@ -475,7 +481,7 @@ public class CashFlowView extends ScrollPane {
         );
 
         overlay.getChildren().add(card);
-        ((Pane) getParent()).getChildren().add(overlay);
+        contentArea.getChildren().add(overlay);
     }
 
     private VBox createLabeledField(String l, Control c) {

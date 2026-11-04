@@ -493,7 +493,7 @@ public class CreateInvoiceView extends ScrollPane {
         inv.updateStatusAutomatically();
         store.addInvoice(inv);
 
-        Toast.show((Pane) getScene().getRoot(), "Invoice " + inv.getInvoiceNumber() + " saved successfully!", true);
+        Toast.show(this, "Invoice " + inv.getInvoiceNumber() + " saved successfully!", true);
         NavigationManager.getInstance().setSelectedInvoice(inv);
         NavigationManager.getInstance().navigateTo(Screen.INVOICE_DETAILS);
     }

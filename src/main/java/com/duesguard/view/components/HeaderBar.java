@@ -130,7 +130,23 @@ public class HeaderBar extends HBox {
             NavigationManager.getInstance().navigateTo(Screen.CREATE_INVOICE);
         });
 
-        rightBox.getChildren().addAll(demoBadge, datePill, searchField, notifBtn, btnCreate);
+        // Quick Exit / Stop button
+        Button btnExit = new Button("✕ Exit");
+        btnExit.setStyle(
+            "-fx-background-color: rgba(255, 107, 107, 0.15); " +
+            "-fx-text-fill: #FF6B6B; " +
+            "-fx-font-weight: bold; " +
+            "-fx-font-size: 12px; " +
+            "-fx-background-radius: 8; " +
+            "-fx-border-color: rgba(255, 107, 107, 0.35); " +
+            "-fx-border-radius: 8; " +
+            "-fx-padding: 7 12; " +
+            "-fx-cursor: hand;"
+        );
+        btnExit.setOnAction(e -> javafx.application.Platform.exit());
+        Tooltip.install(btnExit, new Tooltip("Stop / Close DuesGuard (Ctrl+Q)"));
+
+        rightBox.getChildren().addAll(demoBadge, datePill, searchField, notifBtn, btnCreate, btnExit);
 
         getChildren().addAll(greetingBox, spacer, rightBox);
     }

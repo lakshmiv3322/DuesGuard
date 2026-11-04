@@ -213,9 +213,12 @@ public class PaymentsView extends ScrollPane {
             return;
         }
 
+        StackPane contentArea = NavigationManager.getInstance().getContentArea();
+        if (contentArea == null) return;
+
         StackPane modalOverlay = new StackPane();
         modalOverlay.setStyle("-fx-background-color: rgba(11, 16, 32, 0.85);");
-        modalOverlay.setPrefSize(getWidth(), getHeight());
+        modalOverlay.setPrefSize(contentArea.getWidth(), contentArea.getHeight());
 
         VBox card = new VBox(16);
         card.setMaxWidth(460);
@@ -268,7 +271,7 @@ public class PaymentsView extends ScrollPane {
 
         Button btnCancel = new Button("Cancel");
         btnCancel.setStyle("-fx-background-color: transparent; -fx-text-fill: #9BA8BC; -fx-cursor: hand;");
-        btnCancel.setOnAction(e -> ((Pane) getParent()).getChildren().remove(modalOverlay));
+        btnCancel.setOnAction(e -> contentArea.getChildren().remove(modalOverlay));
 
         Button btnSave = new Button("Save Payment");
         btnSave.setStyle("-fx-background-color: #49E3B4; -fx-text-fill: #0B1020; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 18; -fx-cursor: hand;");
@@ -289,8 +292,8 @@ public class PaymentsView extends ScrollPane {
                 store.addPayment(p);
                 store.saveAll();
 
-                ((Pane) getParent()).getChildren().remove(modalOverlay);
-                Toast.show((Pane) getParent(), "Payment of " + CurrencyFormatter.format(amt) + " recorded successfully!", true);
+                contentArea.getChildren().remove(modalOverlay);
+                Toast.show(contentArea, "Payment of " + CurrencyFormatter.format(amt) + " recorded successfully!", true);
                 refreshTable();
             } catch (Exception ex) {
                 errLbl.setText("Invalid amount.");
@@ -311,7 +314,7 @@ public class PaymentsView extends ScrollPane {
         );
 
         modalOverlay.getChildren().add(card);
-        ((Pane) getParent()).getChildren().add(modalOverlay);
+        contentArea.getChildren().add(modalOverlay);
     }
 
     private VBox createFormField(String lbl, Control c) {

@@ -220,7 +220,7 @@ public class Sidebar extends VBox {
                     : "-fx-background-color: transparent;");
 
                 for (Node child : hbox.getChildren()) {
-                    if (child instanceof Label lbl && !lbl.getText().equals("TOUR")) {
+                    if (child instanceof Label lbl && child != urgentBadge && !lbl.getText().equals("TOUR")) {
                         lbl.setStyle(active
                             ? "-fx-text-fill: #49E3B4; -fx-font-size: 13px; -fx-font-weight: bold;"
                             : "-fx-text-fill: #9BA8BC; -fx-font-size: 13px;");

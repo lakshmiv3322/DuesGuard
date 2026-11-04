@@ -3,6 +3,8 @@ package com.duesguard.app;
 import com.duesguard.view.components.HeaderBar;
 import com.duesguard.view.components.Sidebar;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
@@ -21,11 +23,21 @@ public class DuesGuardApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Minimum dimensions: 1200x800
-        primaryStage.setMinWidth(1200);
-        primaryStage.setMinHeight(800);
-        primaryStage.setWidth(1400);
-        primaryStage.setHeight(900);
+        // Query primary display visual bounds (taking Windows taskbar and scale into account)
+        Rectangle2D visualBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
+        double screenW = visualBounds.getWidth();
+        double screenH = visualBounds.getHeight();
+
+        // Responsive window sizing that always fits within user's physical screen
+        double prefW = Math.min(1360, Math.max(960, screenW * 0.94));
+        double prefH = Math.min(840, Math.max(620, screenH * 0.92));
+
+        primaryStage.setMinWidth(960);
+        primaryStage.setMinHeight(600);
+        primaryStage.setWidth(prefW);
+        primaryStage.setHeight(prefH);
+        primaryStage.setX(visualBounds.getMinX() + (screenW - prefW) / 2.0);
+        primaryStage.setY(visualBounds.getMinY() + (screenH - prefH) / 2.0);
         primaryStage.setTitle("DuesGuard — Know who owes you. Know what to do next.");
 
         // Root container
@@ -51,7 +63,7 @@ public class DuesGuardApp extends Application {
         nav.setMainAppLayout(mainAppLayout, contentArea);
 
         // Scene
-        Scene scene = new Scene(rootContainer, 1400, 900);
+        Scene scene = new Scene(rootContainer, prefW, prefH);
 
         // Load CSS
         URL cssUrl = getClass().getResource("/com/duesguard/css/duesguard-dark.css");
@@ -59,9 +71,11 @@ public class DuesGuardApp extends Application {
             scene.getStylesheets().add(cssUrl.toExternalForm());
         }
 
-        // Global Escape key handler to close modals/dialogs
+        // Global shortcut handlers (Ctrl+Q to exit, Escape to close modals)
         scene.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.ESCAPE) {
+            if (e.isControlDown() && e.getCode() == KeyCode.Q) {
+                Platform.exit();
+            } else if (e.getCode() == KeyCode.ESCAPE) {
                 // If there are modal overlays on rootContainer, dismiss the topmost
                 if (rootContainer.getChildren().size() > 1) {
                     rootContainer.getChildren().remove(rootContainer.getChildren().size() - 1);

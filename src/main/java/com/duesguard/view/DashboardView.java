@@ -39,8 +39,8 @@ public class DashboardView extends ScrollPane {
         setFitToWidth(true);
         setStyle("-fx-background: transparent; -fx-background-color: transparent;");
 
-        VBox content = new VBox(24);
-        content.setPadding(new Insets(28, 36, 48, 36));
+        VBox content = new VBox(20);
+        content.setPadding(new Insets(20, 24, 36, 24));
         content.setMaxWidth(1440);
 
         DataStore store = AppContext.getInstance().getDataStore();
@@ -209,35 +209,35 @@ public class DashboardView extends ScrollPane {
         String label, String value, String trend, String sublabel,
         double[] sparkData, String colorHex, String btnText, Runnable btnAction
     ) {
-        VBox card = new VBox(10);
-        card.setPadding(new Insets(20));
+        VBox card = new VBox(8);
+        card.setPadding(new Insets(14, 16, 14, 16));
         card.setStyle(
             "-fx-background-color: #121A2B; " +
-            "-fx-background-radius: 20; " +
+            "-fx-background-radius: 16; " +
             "-fx-border-color: rgba(255,255,255,0.06); " +
-            "-fx-border-radius: 20; " +
+            "-fx-border-radius: 16; " +
             "-fx-border-width: 1; " +
             "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 18, 0, 0, 4);"
         );
 
         Label lbl = new Label(label);
-        lbl.setStyle("-fx-text-fill: #9BA8BC; -fx-font-size: 12px; -fx-font-weight: 500;");
+        lbl.setStyle("-fx-text-fill: #9BA8BC; -fx-font-size: 11px; -fx-font-weight: 500;");
 
-        HBox valRow = new HBox(12);
+        HBox valRow = new HBox(8);
         valRow.setAlignment(Pos.BASELINE_LEFT);
 
         Label valLbl = new Label(value);
-        valLbl.setStyle("-fx-text-fill: #F6F8FC; -fx-font-size: 24px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;");
+        valLbl.setStyle("-fx-text-fill: #F6F8FC; -fx-font-size: 20px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;");
 
         valRow.getChildren().add(valLbl);
 
-        HBox sparkRow = new HBox(10);
+        HBox sparkRow = new HBox(8);
         sparkRow.setAlignment(Pos.CENTER_LEFT);
 
-        SparklineCanvas spark = new SparklineCanvas(110, 28, sparkData, colorHex, true);
+        SparklineCanvas spark = new SparklineCanvas(80, 22, sparkData, colorHex, true);
 
         Label trendLbl = new Label(trend);
-        trendLbl.setStyle("-fx-text-fill: " + colorHex + "; -fx-font-size: 11px; -fx-font-weight: bold;");
+        trendLbl.setStyle("-fx-text-fill: " + colorHex + "; -fx-font-size: 10px; -fx-font-weight: bold;");
 
         sparkRow.getChildren().addAll(spark, trendLbl);
 
@@ -271,10 +271,10 @@ public class DashboardView extends ScrollPane {
         VBox chartCard = buildCashFlowChartCard(invoices, payments);
         HBox.setHgrow(chartCard, Priority.ALWAYS);
 
-        // Right Card: Today's Action List (width 38%)
+        // Right Card: Today's Action List (responsive width)
         VBox actionCard = buildTodayActionsCard(invoices);
-        actionCard.setPrefWidth(420);
-        actionCard.setMinWidth(380);
+        actionCard.setPrefWidth(350);
+        actionCard.setMinWidth(280);
 
         row.getChildren().addAll(chartCard, actionCard);
         return row;

@@ -402,7 +402,7 @@ public class InvoiceDetailView extends ScrollPane {
             ClipboardContent cc = new ClipboardContent();
             cc.putString(msgArea.getText());
             Clipboard.getSystemClipboard().setContent(cc);
-            Toast.show((Pane) getScene().getRoot(), "Message copied to clipboard!", true);
+            Toast.show(this, "Message copied to clipboard!", true);
         });
 
         Button btnMarkSent = new Button("✓ Mark as Sent");
@@ -410,7 +410,7 @@ public class InvoiceDetailView extends ScrollPane {
         btnMarkSent.setOnAction(e -> {
             FollowUpLog log = new FollowUpLog(invoice.getId(), chanCombo.getValue().name(), "Sent " + toneCombo.getValue().name() + " reminder");
             store.addFollowUpLog(log);
-            Toast.show((Pane) getScene().getRoot(), "Follow-up logged successfully!", true);
+            Toast.show(this, "Follow-up logged successfully!", true);
         });
 
         btnRow.getChildren().addAll(btnCopy, btnMarkSent);
@@ -468,9 +468,12 @@ public class InvoiceDetailView extends ScrollPane {
     // Record Payment Dialog Modal
     // -------------------------------------------------------------
     private void openRecordPaymentDialog() {
+        StackPane contentArea = NavigationManager.getInstance().getContentArea();
+        if (contentArea == null) return;
+
         StackPane modalOverlay = new StackPane();
         modalOverlay.setStyle("-fx-background-color: rgba(11, 16, 32, 0.85);");
-        modalOverlay.setPrefSize(getWidth(), getHeight());
+        modalOverlay.setPrefSize(contentArea.getWidth(), contentArea.getHeight());
 
         VBox card = new VBox(18);
         card.setMaxWidth(460);
@@ -517,7 +520,7 @@ public class InvoiceDetailView extends ScrollPane {
 
         Button btnCancel = new Button("Cancel");
         btnCancel.setStyle("-fx-background-color: transparent; -fx-text-fill: #9BA8BC; -fx-cursor: hand;");
-        btnCancel.setOnAction(e -> ((Pane) getParent()).getChildren().remove(modalOverlay));
+        btnCancel.setOnAction(e -> contentArea.getChildren().remove(modalOverlay));
 
         Button btnSave = new Button("Confirm Payment");
         btnSave.setStyle("-fx-background-color: #49E3B4; -fx-text-fill: #0B1020; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 9 18; -fx-cursor: hand;");
@@ -544,13 +547,13 @@ public class InvoiceDetailView extends ScrollPane {
                 store.addPayment(p);
                 store.saveAll();
 
-                ((Pane) getParent()).getChildren().remove(modalOverlay);
+                contentArea.getChildren().remove(modalOverlay);
 
                 // Check if this was an overdue invoice that got paid: WOW CELEBRATION!
                 if (invoice.getStatus() == Invoice.Status.PAID) {
-                    CelebrationOverlay.showRecoveryCelebration((Pane) getParent(), CurrencyFormatter.format(amt));
+                    CelebrationOverlay.showRecoveryCelebration(contentArea, CurrencyFormatter.format(amt));
                 } else {
-                    Toast.show((Pane) getParent(), "Recorded partial payment of " + CurrencyFormatter.format(amt), true);
+                    Toast.show(contentArea, "Recorded partial payment of " + CurrencyFormatter.format(amt), true);
                 }
 
                 renderView();
@@ -572,7 +575,7 @@ public class InvoiceDetailView extends ScrollPane {
         );
 
         modalOverlay.getChildren().add(card);
-        ((Pane) getParent()).getChildren().add(modalOverlay);
+        contentArea.getChildren().add(modalOverlay);
     }
 
     private VBox createLabeledField(String lbl, Control ctrl) {

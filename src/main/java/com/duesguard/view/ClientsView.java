@@ -246,9 +246,12 @@ public class ClientsView extends ScrollPane {
     }
 
     private void openAddClientDialog() {
+        StackPane contentArea = NavigationManager.getInstance().getContentArea();
+        if (contentArea == null) return;
+
         StackPane modalOverlay = new StackPane();
         modalOverlay.setStyle("-fx-background-color: rgba(11, 16, 32, 0.85);");
-        modalOverlay.setPrefSize(getWidth(), getHeight());
+        modalOverlay.setPrefSize(contentArea.getWidth(), contentArea.getHeight());
 
         VBox card = new VBox(16);
         card.setMaxWidth(440);
@@ -286,7 +289,7 @@ public class ClientsView extends ScrollPane {
 
         Button btnCancel = new Button("Cancel");
         btnCancel.setStyle("-fx-background-color: transparent; -fx-text-fill: #9BA8BC; -fx-cursor: hand;");
-        btnCancel.setOnAction(e -> ((Pane) getParent()).getChildren().remove(modalOverlay));
+        btnCancel.setOnAction(e -> contentArea.getChildren().remove(modalOverlay));
 
         Button btnSave = new Button("Save Client");
         btnSave.setStyle("-fx-background-color: #49E3B4; -fx-text-fill: #0B1020; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 18; -fx-cursor: hand;");
@@ -301,8 +304,8 @@ public class ClientsView extends ScrollPane {
             } catch (Exception ignored) {}
 
             store.addClient(c);
-            ((Pane) getParent()).getChildren().remove(modalOverlay);
-            Toast.show((Pane) getParent(), "Client " + c.getName() + " added successfully!", true);
+            contentArea.getChildren().remove(modalOverlay);
+            Toast.show(contentArea, "Client " + c.getName() + " added successfully!", true);
             refreshClients();
         });
 
@@ -320,7 +323,7 @@ public class ClientsView extends ScrollPane {
         );
 
         modalOverlay.getChildren().add(card);
-        ((Pane) getParent()).getChildren().add(modalOverlay);
+        contentArea.getChildren().add(modalOverlay);
     }
 
     private VBox createFormField(String lbl, Control c) {

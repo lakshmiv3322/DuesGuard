@@ -84,18 +84,17 @@ public class CelebrationOverlay {
         for (int i = 0; i < 28; i++) {
             Circle p = new Circle(rng.nextDouble() * 3 + 2);
             p.setFill(colors[rng.nextInt(colors.length)]);
-            p.setTranslateX(root.getWidth() / 2.0);
-            p.setTranslateY(root.getHeight() / 2.0);
+            // Start particles at the centre of the overlay
+            p.setLayoutX(root.getWidth() / 2.0);
+            p.setLayoutY(root.getHeight() / 2.0);
             particlePane.getChildren().add(p);
 
             double angle = rng.nextDouble() * 2 * Math.PI;
             double dist = rng.nextDouble() * 160 + 60;
-            double destX = (root.getWidth() / 2.0) + Math.cos(angle) * dist;
-            double destY = (root.getHeight() / 2.0) + Math.sin(angle) * dist;
 
             TranslateTransition tt = new TranslateTransition(Duration.millis(900), p);
-            tt.setToX(destX);
-            tt.setToY(destY);
+            tt.setByX(Math.cos(angle) * dist);
+            tt.setByY(Math.sin(angle) * dist);
 
             FadeTransition ft = new FadeTransition(Duration.millis(900), p);
             ft.setFromValue(1.0);

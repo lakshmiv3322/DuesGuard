@@ -2,6 +2,7 @@ package com.duesguard.view.components;
 
 import com.duesguard.model.Client;
 import com.duesguard.model.Invoice;
+import com.duesguard.util.CurrencyFormatter;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
@@ -61,6 +62,7 @@ public class Priority3DConstellation extends StackPane {
         hubMat.setSpecularColor(Color.web("#49E3B4"));
         hubMat.setSpecularPower(20);
         hub.setMaterial(hubMat);
+        Tooltip.install(hub, new Tooltip("DuesGuard Central Hub • Payment Recovery Command Centre"));
         constellationGroup.getChildren().add(hub);
 
         // Position clients in orbit
@@ -81,15 +83,25 @@ public class Priority3DConstellation extends StackPane {
             cMat.setDiffuseColor(Color.web("#7C83FF"));
             cMat.setSpecularColor(Color.web("#FFFFFF"));
             clientSphere.setMaterial(cMat);
+            String relDisplay = (c.getReliability() != null) ? c.getReliability().getDisplay() : "Normal";
+            Tooltip.install(clientSphere, new Tooltip("Client: " + c.getName() + " (" + relDisplay + ")\nAvg delay: " + c.getTypicalDelayDays() + " days"));
             constellationGroup.getChildren().add(clientSphere);
 
-            // Connect client to hub with subtle cylinder beam
-            Cylinder beam = new Cylinder(1.0, clientRadius);
-            beam.setTranslateX(cx / 2);
-            beam.setTranslateZ(cz / 2);
-            beam.setRotationAxis(Rotate.Y_AXIS);
-            beam.setRotate(Math.toDegrees(angle) + 90);
-            PhongMaterial beamMat = new PhongMaterial(Color.web("rgba(124,131,255,0.3)"));
+            // Connect client to hub with subtle cylinder beam.
+            // A JavaFX Cylinder's default axis is Y (vertical).
+            // To make it point from origin (0,0,0) toward (cx, 0, cz):
+            //   1. Place the beam midpoint at (cx/2, 0, cz/2).
+            //   2. Rotate 90° around X-axis → cylinder now lies flat in the XZ plane.
+            //   3. Rotate by (90 - angle) around Y-axis → precisely aligns with the client direction vector.
+            Cylinder beam = new Cylinder(1.2, clientRadius);
+            beam.setTranslateX(cx / 2.0);
+            beam.setTranslateZ(cz / 2.0);
+            Rotate tiltFlat = new Rotate(90, Rotate.X_AXIS);
+            Rotate alignDir = new Rotate(90.0 - Math.toDegrees(angle), Rotate.Y_AXIS);
+            beam.getTransforms().addAll(alignDir, tiltFlat);
+            PhongMaterial beamMat = new PhongMaterial();
+            beamMat.setDiffuseColor(Color.color(0.49, 0.51, 1.0, 0.25));
+            beamMat.setSpecularColor(Color.color(0.49, 0.51, 1.0, 0.1));
             beam.setMaterial(beamMat);
             constellationGroup.getChildren().add(beam);
 
@@ -100,11 +112,12 @@ public class Priority3DConstellation extends StackPane {
 
             for (int j = 0; j < clientInvoices.size(); j++) {
                 Invoice inv = clientInvoices.get(j);
-                double invAngle = angle + ((j + 1) * (Math.PI / 4));
-                double invDist = inv.getStatus() == Invoice.Status.PAID ? 40 : 130;
-                double ix = cx + Math.cos(invAngle) * (invDist - clientRadius);
-                double iz = cz + Math.sin(invAngle) * (invDist - clientRadius);
-                double iy = (j % 2 == 0 ? 1 : -1) * (18 + j * 12);
+                // Position invoice node relative to its client sphere hub
+                double invAngle = angle + ((j + 1) * (Math.PI / 3.5));
+                double invDist = inv.getStatus() == Invoice.Status.PAID ? 36 : 50;
+                double ix = cx + Math.cos(invAngle) * invDist;
+                double iz = cz + Math.sin(invAngle) * invDist;
+                double iy = (j % 2 == 0 ? 1 : -1) * (14 + j * 10);
 
                 // Invoice node: Box or Sphere
                 Node invNode;
@@ -142,6 +155,12 @@ public class Priority3DConstellation extends StackPane {
                 invNode.setTranslateZ(iz);
                 invNode.setStyle("-fx-cursor: hand;");
 
+                String tipText = inv.getInvoiceNumber() + " (" + c.getName() + ")\n" +
+                    "Balance: " + CurrencyFormatter.format(inv.getBalance()) + "\n" +
+                    (inv.getDaysOverdue() > 0 ? "⚠ " + inv.getDaysOverdue() + " days overdue" : "Status: " + inv.getStatus().getDisplay()) + "\n" +
+                    "Click to inspect in drawer";
+                Tooltip.install(invNode, new Tooltip(tipText));
+
                 invNode.setOnMouseClicked(e -> {
                     if (onInvoiceClick != null) onInvoiceClick.accept(inv);
                 });
@@ -170,6 +189,30 @@ public class Priority3DConstellation extends StackPane {
         rot.setCycleCount(Animation.INDEFINITE);
         rot.setInterpolator(Interpolator.LINEAR);
         rot.play();
+
+        // Interactive mouse drag to rotate constellation
+        final double[] anchorX = new double[1];
+        final double[] anchorY = new double[1];
+        final double[] anchorAngleX = new double[1];
+        final double[] anchorAngleY = new double[1];
+        Rotate mouseRotateX = new Rotate(0, Rotate.X_AXIS);
+        Rotate mouseRotateY = new Rotate(0, Rotate.Y_AXIS);
+        constellationGroup.getTransforms().addAll(mouseRotateY, mouseRotateX);
+
+        subScene.setOnMousePressed(event -> {
+            anchorX[0] = event.getSceneX();
+            anchorY[0] = event.getSceneY();
+            anchorAngleX[0] = mouseRotateX.getAngle();
+            anchorAngleY[0] = mouseRotateY.getAngle();
+            rot.pause();
+        });
+
+        subScene.setOnMouseDragged(event -> {
+            mouseRotateY.setAngle(anchorAngleY[0] + (event.getSceneX() - anchorX[0]) * 0.4);
+            mouseRotateX.setAngle(anchorAngleX[0] - (event.getSceneY() - anchorY[0]) * 0.4);
+        });
+
+        subScene.setOnMouseReleased(event -> rot.play());
 
         getChildren().add(subScene);
     }

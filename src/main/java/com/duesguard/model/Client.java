@@ -83,6 +83,10 @@ public class Client {
     public ReliabilityLabel getReliabilityLabel() { return reliabilityLabel; }
     public void setReliabilityLabel(ReliabilityLabel reliabilityLabel) { this.reliabilityLabel = reliabilityLabel; }
 
+    public ReliabilityLabel getReliability() {
+        return reliabilityLabel != null ? reliabilityLabel : ReliabilityLabel.NOT_ENOUGH_HISTORY;
+    }
+
     public String getDisplayName() {
         return (company != null && !company.isEmpty()) ? name + " (" + company + ")" : name;
     }
